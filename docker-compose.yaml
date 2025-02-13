@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:15.10
+    image: postgis/postgis:15-3.5
     restart: "no"
     ports:
       - "5432:5432"
