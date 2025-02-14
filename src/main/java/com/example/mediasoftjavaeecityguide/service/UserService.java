@@ -1,6 +1,7 @@
 package com.example.mediasoftjavaeecityguide.service;
 
 import com.example.mediasoftjavaeecityguide.model.User;
+import com.example.mediasoftjavaeecityguide.repository.CommentRepository;
 import com.example.mediasoftjavaeecityguide.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +22,11 @@ public class UserService implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final CommentRepository commentRepository;
+
     @PostConstruct
     void post() {
+        commentRepository.deleteAll();
         userRepository.deleteAll();
 
         User user = new User(

@@ -15,7 +15,7 @@ public interface LocationRepository extends JpaRepository<Location, Long>, JpaSp
 
     @Query(value = """
             with locations_by_distance AS
-            (SELECT id, name, category, rating, latitude, longitude, rating_num, city_name,
+            (SELECT id, name, category, rating, latitude, longitude, rating_num, city_id,
             (ST_DistanceSphere(ST_Point(loc.latitude, loc.longitude), ST_Point(:fromLat, :fromLon))) as distance
             from location as loc
             where (:category IS NULL OR category = :category)
@@ -31,6 +31,25 @@ public interface LocationRepository extends JpaRepository<Location, Long>, JpaSp
                                @Param("lim") Integer limit,
                                @Param("minRating") @DecimalMin("0.0") @DecimalMax("5.0") Double minRating,
                                @Param("category") String category);
+
+    @Query(value = """
+            with locations_by_distance AS
+            (SELECT loc.id, loc.name, category, rating, latitude, longitude, rating_num, city_id,
+            (ST_DistanceSphere(ST_Point(loc.latitude, loc.longitude), ST_Point(:fromLat, :fromLon))) as distance
+            from location as loc join city on loc.city_id = city.id
+            where city.name = :cityName
+            and (:category IS NULL OR category = :category)
+            and (:minRating IS NULL OR rating >= :minRating)
+            order by distance
+            limit :lim)
+            select * from locations_by_distance
+            """, nativeQuery = true)
+    List<Location> findByCityName(@Param("cityName") String cityName,
+                                  @Param("fromLat") Double fromLat,
+                                  @Param("fromLon") Double fromLon,
+                                  @Param("lim") Integer limit,
+                                  @Param("minRating") @DecimalMin("0.0") @DecimalMax("5.0") Double minRating,
+                                  @Param("category") String category);
 
     Optional<Location> findByName(String name);
 }

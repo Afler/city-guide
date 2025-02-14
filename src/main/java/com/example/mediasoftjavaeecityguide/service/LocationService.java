@@ -1,17 +1,16 @@
 package com.example.mediasoftjavaeecityguide.service;
 
+import com.example.mediasoftjavaeecityguide.controller.FindNearestLocationsInCityRequest;
 import com.example.mediasoftjavaeecityguide.controller.FindNearestLocationsRequest;
+import com.example.mediasoftjavaeecityguide.model.Comment;
 import com.example.mediasoftjavaeecityguide.model.GeoPoint;
 import com.example.mediasoftjavaeecityguide.model.Location;
 import com.example.mediasoftjavaeecityguide.repository.LocationRepository;
+import com.example.mediasoftjavaeecityguide.repository.UserRepository;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Path;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Min;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
 import org.hibernate.query.criteria.JpaFunction;
 import org.hibernate.query.sqm.internal.SqmCriteriaNodeBuilder;
@@ -31,6 +30,9 @@ public class LocationService {
 
     @Autowired
     private LocationRepository locationRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     public List<Location> findAll() {
         return locationRepository.findAll();
@@ -64,6 +66,18 @@ public class LocationService {
         return locationRepository.save(location);
     }
 
+    @Transactional
+    public Location addCommentAboutLocation(String locationName, String username, String content) {
+        Location location = findByName(locationName).orElseThrow();
+        Comment newComment = new Comment();
+
+        newComment.setLocation(location);
+        newComment.setContent(content);
+        newComment.setUser(userRepository.findByUsername(username));
+
+        return locationRepository.save(location);
+    }
+
     public List<Location> findNearestNative(FindNearestLocationsRequest findNearestLocationsRequest) {
         return locationRepository.findNearest(findNearestLocationsRequest.getMaxDistanceFilter(),
                 findNearestLocationsRequest.getCurrentUserPosition().getLatitude(),
@@ -71,6 +85,16 @@ public class LocationService {
                 findNearestLocationsRequest.getMaxCount() == null ? 10 : findNearestLocationsRequest.getMaxCount(),
                 findNearestLocationsRequest.getMinRating() == null ? 0 : findNearestLocationsRequest.getMinRating(),
                 findNearestLocationsRequest.getCategory() == null ? null : findNearestLocationsRequest.getCategory().toString());
+    }
+
+    public List<Location> findByCityNameNative(FindNearestLocationsInCityRequest findNearestLocationsInCityRequest) {
+        return locationRepository.findByCityName(
+                findNearestLocationsInCityRequest.getCityName(),
+                findNearestLocationsInCityRequest.getCurrentUserPosition().getLatitude(),
+                findNearestLocationsInCityRequest.getCurrentUserPosition().getLongitude(),
+                findNearestLocationsInCityRequest.getMaxCount() == null ? 10 : findNearestLocationsInCityRequest.getMaxCount(),
+                findNearestLocationsInCityRequest.getMinRating() == null ? 0 : findNearestLocationsInCityRequest.getMinRating(),
+                findNearestLocationsInCityRequest.getCategory() == null ? null : findNearestLocationsInCityRequest.getCategory().toString());
     }
 
     public List<Location> findNearestSpec(FindNearestLocationsRequest findNearestLocationsRequest) {
@@ -87,7 +111,7 @@ public class LocationService {
 
 //            jtsBuilder.durationByUnit()
 
-            //TODO использование PostGis функций в спецификации
+            // TODO использование PostGis функций в API спецификации
             Expression<Geometry> coordsAsGeometry = criteriaBuilder.function("ST_Point", Geometry.class, latitude, longitude);
             GeoPoint currentUserPosition = findNearestLocationsRequest.getCurrentUserPosition();
             JpaFunction<Geometry> stPoint = jtsBuilder.function("ST_Point", Geometry.class, criteriaBuilder.literal(currentUserPosition.getLatitude()), criteriaBuilder.literal(currentUserPosition.getLongitude()));

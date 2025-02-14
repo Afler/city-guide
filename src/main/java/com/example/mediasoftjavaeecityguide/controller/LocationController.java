@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@RestController("/location")
 @RequiredArgsConstructor
 public class LocationController {
 
@@ -38,6 +38,25 @@ public class LocationController {
 
     @SpringSwaggerEndpoint(
             method = RequestMethod.POST,
+            path = "/byCityName/native",
+            description = "Получить все локации в указанном городе с фильтрацией " +
+                          "с помощью нативного SQL запроса."
+    )
+    public List<Location> findByCityNameNative(@Valid @RequestBody FindNearestLocationsInCityRequest request) {
+        return locationService.findByCityNameNative(request);
+    }
+
+    @SpringSwaggerEndpoint(
+            method = RequestMethod.GET,
+            path = "/findByName",
+            description = "Найти локацию по названию."
+    )
+    public Location addLocationRatingScore(@RequestParam String locationName) {
+        return locationService.findByName(locationName).orElse(null);
+    }
+
+    @SpringSwaggerEndpoint(
+            method = RequestMethod.POST,
             path = "/addScore",
             description = "Выставить оценку локации."
     )
@@ -45,4 +64,5 @@ public class LocationController {
                                            @RequestParam @DecimalMin("0.0") @DecimalMax("5.0") Double score) {
         return locationService.addRatingScore(locationName, score);
     }
+
 }

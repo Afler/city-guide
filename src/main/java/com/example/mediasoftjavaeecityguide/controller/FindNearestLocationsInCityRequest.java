@@ -9,14 +9,14 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class FindNearestLocationsRequest {
+public class FindNearestLocationsInCityRequest {
 
     @NotNull
     @Schema(description = "Текущая позиция пользователя")
     private GeoPoint currentUserPosition;
 
-    @Schema(description = "Фильтр по максимальной дистанции от текущей позиции")
-    private Double maxDistanceFilter;
+    @Schema(description = "Фильтр по городу")
+    private String cityName;
 
     @Schema(description = "Максимальное количество возвращаемых локаций")
     private Integer maxCount;

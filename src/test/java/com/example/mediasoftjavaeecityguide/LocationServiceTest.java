@@ -48,8 +48,7 @@ public class LocationServiceTest {
                 0,
                 city);
 
-        Mockito.when(locationRepository.findByName(TEST_LOCATION_NAME))
-                .thenReturn(Optional.of(location));
+        Mockito.when(locationRepository.findByName(TEST_LOCATION_NAME)).thenReturn(Optional.of(location));
     }
 
     @Test
