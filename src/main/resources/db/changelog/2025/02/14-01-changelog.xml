@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+
+
+    <changeSet id="1739534114775-1" author="Afler (generated)">
+        <createSequence incrementBy="50" sequenceName="app_users_seq" startValue="1"/>
+    </changeSet>
+    <changeSet id="1739534114775-2" author="Afler (generated)">
+        <createSequence incrementBy="50" sequenceName="city_seq" startValue="1"/>
+    </changeSet>
+    <changeSet id="1739534114775-3" author="Afler (generated)">
+        <createSequence incrementBy="50" sequenceName="comment_seq" startValue="1"/>
+    </changeSet>
+    <changeSet id="1739534114775-4" author="Afler (generated)">
+        <createSequence incrementBy="50" sequenceName="location_seq" startValue="1"/>
+    </changeSet>
+    <changeSet id="1739534114775-5" author="Afler (generated)">
+        <createTable tableName="app_users">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_app_users"/>
+            </column>
+            <column name="username" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1739534114775-6" author="Afler (generated)">
+        <createTable tableName="city">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_city"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1739534114775-7" author="Afler (generated)">
+        <createTable tableName="comment">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_comment"/>
+            </column>
+            <column name="content" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1739534114775-8" author="Afler (generated)">
+        <createTable tableName="location">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_location"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rating" type="DOUBLE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rating_num" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="city_id" type="BIGINT"/>
+            <column name="latitude" type="DOUBLE"/>
+            <column name="longitude" type="DOUBLE"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1739534114775-9" author="Afler (generated)">
+        <createTable tableName="user_authorities">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authorities" type="bytea"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1739534114775-10" author="Afler (generated)">
+        <addUniqueConstraint columnNames="username" constraintName="uc_app_users_username" tableName="app_users"/>
+    </changeSet>
+    <changeSet id="1739534114775-11" author="Afler (generated)">
+        <addUniqueConstraint columnNames="location_id" constraintName="uc_comment_location" tableName="comment"/>
+    </changeSet>
+    <changeSet id="1739534114775-12" author="Afler (generated)">
+        <addUniqueConstraint columnNames="user_id" constraintName="uc_comment_user" tableName="comment"/>
+    </changeSet>
+    <changeSet id="1739534114775-13" author="Afler (generated)">
+        <addUniqueConstraint columnNames="name" constraintName="uc_location_name" tableName="location"/>
+    </changeSet>
+    <changeSet id="1739534114775-14" author="Afler (generated)">
+        <addForeignKeyConstraint baseColumnNames="location_id" baseTableName="comment"
+                                 constraintName="FK_COMMENT_ON_LOCATION" referencedColumnNames="id"
+                                 referencedTableName="location"/>
+    </changeSet>
+    <changeSet id="1739534114775-15" author="Afler (generated)">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="comment" constraintName="FK_COMMENT_ON_USER"
+                                 referencedColumnNames="id" referencedTableName="app_users"/>
+    </changeSet>
+    <changeSet id="1739534114775-16" author="Afler (generated)">
+        <addForeignKeyConstraint baseColumnNames="city_id" baseTableName="location" constraintName="FK_LOCATION_ON_CITY"
+                                 referencedColumnNames="id" referencedTableName="city"/>
+    </changeSet>
+    <changeSet id="1739534114775-17" author="Afler (generated)">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="user_authorities"
+                                 constraintName="fk_user_authorities_on_user" referencedColumnNames="id"
+                                 referencedTableName="app_users"/>
+    </changeSet>
+</databaseChangeLog>

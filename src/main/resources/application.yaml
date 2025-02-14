@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: MediaSoftJavaEECityGuide
+  datasource:
+    url: 'jdbc:postgresql://localhost/MediaSoftJavaEECityGuide'
+    username: root
+    password: root
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    change-log: 'classpath:/db/changelog/db.changelog-master.xml'
+    enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+server:
+  port: '90'
+springdoc:
+  show-login-endpoint: true
+
+app:
+  version: 0.1
+  description: "API путеводителя по городским достопримечательностям"

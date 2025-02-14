@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface LocationRepository extends JpaRepository<Location, Long>, JpaSpecificationExecutor<Location> {
 
@@ -30,4 +31,6 @@ public interface LocationRepository extends JpaRepository<Location, Long>, JpaSp
                                @Param("lim") Integer limit,
                                @Param("minRating") @DecimalMin("0.0") @DecimalMax("5.0") Double minRating,
                                @Param("category") String category);
+
+    Optional<Location> findByName(String name);
 }

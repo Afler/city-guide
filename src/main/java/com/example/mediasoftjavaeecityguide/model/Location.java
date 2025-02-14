@@ -2,7 +2,9 @@ package com.example.mediasoftjavaeecityguide.model;
 
 import com.example.mediasoftjavaeecityguide.utils.GeoUtils;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.NumberFormat;
 
@@ -10,9 +12,11 @@ import org.springframework.format.annotation.NumberFormat;
 @Setter
 @Entity
 @Table(name = "location")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Location extends BaseEntity {
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     @Enumerated(EnumType.STRING)
@@ -31,7 +35,7 @@ public class Location extends BaseEntity {
     private Integer ratingNum;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "city_name")
+    @JoinColumn(name = "city_id")
     private City city;
 
     public double calculateDistance(Location toLocation) {
