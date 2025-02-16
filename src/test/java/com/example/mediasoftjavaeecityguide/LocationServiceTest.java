@@ -61,15 +61,6 @@ public class LocationServiceTest {
 
 
     @Test
-    void locationService_SaveLocation_ReturnLocation() {
-        Location location = getLocation(getCity());
-
-        locationService.save(location);
-
-        Assertions.assertTrue(locationRepository.findByName(TEST_LOCATION_NAME).isPresent());
-    }
-
-    @Test
     void locationService_AddLocationFirstRatingScore_ReturnLocation() {
         double newScore = 5.0;
 

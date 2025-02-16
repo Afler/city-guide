@@ -43,16 +43,6 @@ public class LocationService {
     }
 
     @Transactional
-    public Location save(Location location) {
-        return locationRepository.save(location);
-    }
-
-    @Transactional
-    public List<Location> saveAll(Collection<Location> locations) {
-        return locationRepository.saveAll(locations);
-    }
-
-    @Transactional
     public Location addRatingScore(String locationName, @DecimalMin("1.0") @DecimalMax("5.0") Double score) {
         Location location = locationRepository.findByName(locationName).orElseThrow();
         Double currentRating = location.getRating();
