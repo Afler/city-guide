@@ -1,6 +1,6 @@
 package com.example.mediasoftjavaeecityguide.service;
 
-import com.example.mediasoftjavaeecityguide.controller.dto.FindNearestLocationsInCityRequest;
+import com.example.mediasoftjavaeecityguide.controller.dto.FindCityLocationsRequest;
 import com.example.mediasoftjavaeecityguide.controller.dto.FindNearestLocationsRequest;
 import com.example.mediasoftjavaeecityguide.model.GeoPoint;
 import com.example.mediasoftjavaeecityguide.model.Location;
@@ -63,7 +63,7 @@ public class LocationService {
                 findNearestLocationsRequest.getCategory() == null ? null : findNearestLocationsRequest.getCategory().toString());
     }
 
-    public List<Location> findByCityNameNative(FindNearestLocationsInCityRequest findNearestLocationsInCityRequest) {
+    public List<Location> findByCityNameNative(FindCityLocationsRequest findNearestLocationsInCityRequest) {
         return locationRepository.findByCityName(
                 findNearestLocationsInCityRequest.getCityName(),
                 findNearestLocationsInCityRequest.getCurrentUserPosition().getLatitude(),

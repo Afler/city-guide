@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class FindNearestLocationsInCityRequest extends FindLocationRequest {
+public class FindCityLocationsRequest extends FindLocationRequest {
 
     @Schema(description = "Фильтр по городу.", nullable = true)
     private String cityName;

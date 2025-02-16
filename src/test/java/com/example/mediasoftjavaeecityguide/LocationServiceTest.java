@@ -1,6 +1,6 @@
 package com.example.mediasoftjavaeecityguide;
 
-import com.example.mediasoftjavaeecityguide.controller.dto.FindNearestLocationsInCityRequest;
+import com.example.mediasoftjavaeecityguide.controller.dto.FindCityLocationsRequest;
 import com.example.mediasoftjavaeecityguide.controller.dto.FindNearestLocationsRequest;
 import com.example.mediasoftjavaeecityguide.model.City;
 import com.example.mediasoftjavaeecityguide.model.GeoPoint;
@@ -119,7 +119,7 @@ public class LocationServiceTest {
         Integer maxCount = 2;
         LocationCategory categoryFilter = LocationCategory.ARCHITECTURE;
         Double minRatingFilter = 5.0;
-        FindNearestLocationsInCityRequest request = FindNearestLocationsInCityRequest
+        FindCityLocationsRequest request = FindCityLocationsRequest
                 .builder()
                 .currentUserPosition(currentUserPosition)
                 .category(categoryFilter)

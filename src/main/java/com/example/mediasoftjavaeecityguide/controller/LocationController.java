@@ -1,6 +1,6 @@
 package com.example.mediasoftjavaeecityguide.controller;
 
-import com.example.mediasoftjavaeecityguide.controller.dto.FindNearestLocationsInCityRequest;
+import com.example.mediasoftjavaeecityguide.controller.dto.FindCityLocationsRequest;
 import com.example.mediasoftjavaeecityguide.controller.dto.FindNearestLocationsRequest;
 import com.example.mediasoftjavaeecityguide.model.Location;
 import com.example.mediasoftjavaeecityguide.service.LocationService;
@@ -46,7 +46,7 @@ public class LocationController {
                           "с помощью нативного SQL запроса. " +
                           "Для отключения фильтрации по конкретному параметру его необходимо указать как null."
     )
-    public List<Location> findByCityNameNative(@Valid @RequestBody FindNearestLocationsInCityRequest request) {
+    public List<Location> findByCityNameNative(@Valid @RequestBody FindCityLocationsRequest request) {
         return locationService.findByCityNameNative(request);
     }
 
