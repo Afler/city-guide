@@ -37,7 +37,7 @@ public interface LocationRepository extends JpaRepository<Location, Long>, JpaSp
             (SELECT loc.id, loc.name, category, rating, latitude, longitude, rating_num, city_id,
             (ST_DistanceSphere(ST_Point(loc.latitude, loc.longitude), ST_Point(:fromLat, :fromLon))) as distance
             from location as loc join city on loc.city_id = city.id
-            where city.name = :cityName
+            where (:cityName is NULL OR city.name = :cityName)
             and (:category IS NULL OR category = :category)
             and (:minRating IS NULL OR rating >= :minRating)
             order by distance

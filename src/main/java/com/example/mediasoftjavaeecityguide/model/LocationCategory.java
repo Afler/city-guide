@@ -7,5 +7,6 @@ public enum LocationCategory {
     RECREATION,
     NATURE,
     RELIGION,
-    CATERING
+    CATERING,
+    CULTURE
 }

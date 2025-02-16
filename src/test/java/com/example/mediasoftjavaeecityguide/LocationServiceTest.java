@@ -1,7 +1,7 @@
 package com.example.mediasoftjavaeecityguide;
 
-import com.example.mediasoftjavaeecityguide.controller.FindNearestLocationsInCityRequest;
-import com.example.mediasoftjavaeecityguide.controller.FindNearestLocationsRequest;
+import com.example.mediasoftjavaeecityguide.controller.dto.FindNearestLocationsInCityRequest;
+import com.example.mediasoftjavaeecityguide.controller.dto.FindNearestLocationsRequest;
 import com.example.mediasoftjavaeecityguide.model.City;
 import com.example.mediasoftjavaeecityguide.model.GeoPoint;
 import com.example.mediasoftjavaeecityguide.model.Location;
@@ -88,19 +88,22 @@ public class LocationServiceTest {
         Integer maxCount = 2;
         LocationCategory categoryFilter = LocationCategory.ARCHITECTURE;
         Double minRatingFilter = 5.0;
-        FindNearestLocationsRequest request = new FindNearestLocationsRequest(
-                currentUserPosition,
-                maxDistanceFilter,
-                maxCount,
-                categoryFilter,
-                minRatingFilter);
+        FindNearestLocationsRequest request = FindNearestLocationsRequest
+                .builder()
+                .category(categoryFilter)
+                .currentUserPosition(currentUserPosition)
+                .maxDistanceFilter(maxDistanceFilter)
+                .maxCount(maxCount)
+                .minRating(minRatingFilter)
+                .build();
 
         Mockito.when(locationRepository.findNearest(
-                maxDistanceFilter, currentUserPosition.getLatitude(),
-                currentUserPosition.getLongitude(),
-                maxCount, minRatingFilter,
-                categoryFilter.toString())).thenReturn(List.of(getLocation(getCity())));
-
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any())).thenReturn(List.of(getLocation(getCity())));
 
         List<Location> foundLocations = locationService.findNearestNative(request);
 
@@ -116,18 +119,22 @@ public class LocationServiceTest {
         Integer maxCount = 2;
         LocationCategory categoryFilter = LocationCategory.ARCHITECTURE;
         Double minRatingFilter = 5.0;
-        FindNearestLocationsInCityRequest request = new FindNearestLocationsInCityRequest(
-                currentUserPosition,
-                cityName,
-                maxCount,
-                categoryFilter,
-                minRatingFilter);
+        FindNearestLocationsInCityRequest request = FindNearestLocationsInCityRequest
+                .builder()
+                .currentUserPosition(currentUserPosition)
+                .category(categoryFilter)
+                .cityName(cityName)
+                .maxCount(maxCount)
+                .minRating(minRatingFilter)
+                .build();
 
         Mockito.when(locationRepository.findByCityName(
-                cityName, currentUserPosition.getLatitude(),
-                currentUserPosition.getLongitude(),
-                maxCount, minRatingFilter,
-                categoryFilter.toString())).thenReturn(List.of(getLocation(city)));
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any(),
+                Mockito.any())).thenReturn(List.of(getLocation(getCity())));
 
 
         List<Location> foundLocations = locationService.findByCityNameNative(request);

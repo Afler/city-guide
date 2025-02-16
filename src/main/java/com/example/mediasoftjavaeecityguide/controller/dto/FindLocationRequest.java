@@ -1,4 +1,5 @@
-package com.example.mediasoftjavaeecityguide.controller;
+package com.example.mediasoftjavaeecityguide.controller.dto;
+
 
 import com.example.mediasoftjavaeecityguide.model.GeoPoint;
 import com.example.mediasoftjavaeecityguide.model.LocationCategory;
@@ -9,27 +10,30 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FindNearestLocationsRequest {
+@SuperBuilder
+public class FindLocationRequest {
 
     @NotNull
     @Schema(description = "Текущая позиция пользователя")
     private GeoPoint currentUserPosition;
 
-    @Schema(description = "Фильтр по максимальной дистанции от текущей позиции")
-    private Double maxDistanceFilter;
+    @Schema(description = "Максимальное количество возвращаемых локаций.", nullable = true, defaultValue = "10")
+    private Integer maxCount = 10;
 
-    @Schema(description = "Максимальное количество возвращаемых локаций")
-    private Integer maxCount;
-
-    @Schema(description = "Фильтр по категории")
+    @Schema(description = "Фильтр по категории.", nullable = true)
     private LocationCategory category;
 
     @DecimalMin("0.0")
     @DecimalMax("5.0")
-    @Schema(description = "Фильтр по минимальному рейтингу локации")
-    private Double minRating;
+    @Schema(description = "Фильтр по минимальному рейтингу локации.",
+            nullable = true,
+            minimum = "0.0",
+            maximum = "5.0",
+            defaultValue = "0.0")
+    private Double minRating = 0.0;
 }

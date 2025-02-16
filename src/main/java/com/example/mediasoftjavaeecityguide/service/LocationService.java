@@ -1,8 +1,7 @@
 package com.example.mediasoftjavaeecityguide.service;
 
-import com.example.mediasoftjavaeecityguide.controller.FindNearestLocationsInCityRequest;
-import com.example.mediasoftjavaeecityguide.controller.FindNearestLocationsRequest;
-import com.example.mediasoftjavaeecityguide.model.Comment;
+import com.example.mediasoftjavaeecityguide.controller.dto.FindNearestLocationsInCityRequest;
+import com.example.mediasoftjavaeecityguide.controller.dto.FindNearestLocationsRequest;
 import com.example.mediasoftjavaeecityguide.model.GeoPoint;
 import com.example.mediasoftjavaeecityguide.model.Location;
 import com.example.mediasoftjavaeecityguide.repository.LocationRepository;
@@ -21,7 +20,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,8 +58,8 @@ public class LocationService {
         return locationRepository.findNearest(findNearestLocationsRequest.getMaxDistanceFilter(),
                 findNearestLocationsRequest.getCurrentUserPosition().getLatitude(),
                 findNearestLocationsRequest.getCurrentUserPosition().getLongitude(),
-                findNearestLocationsRequest.getMaxCount() == null ? 10 : findNearestLocationsRequest.getMaxCount(),
-                findNearestLocationsRequest.getMinRating() == null ? 0 : findNearestLocationsRequest.getMinRating(),
+                findNearestLocationsRequest.getMaxCount(),
+                findNearestLocationsRequest.getMinRating(),
                 findNearestLocationsRequest.getCategory() == null ? null : findNearestLocationsRequest.getCategory().toString());
     }
 
@@ -70,8 +68,8 @@ public class LocationService {
                 findNearestLocationsInCityRequest.getCityName(),
                 findNearestLocationsInCityRequest.getCurrentUserPosition().getLatitude(),
                 findNearestLocationsInCityRequest.getCurrentUserPosition().getLongitude(),
-                findNearestLocationsInCityRequest.getMaxCount() == null ? 10 : findNearestLocationsInCityRequest.getMaxCount(),
-                findNearestLocationsInCityRequest.getMinRating() == null ? 0 : findNearestLocationsInCityRequest.getMinRating(),
+                findNearestLocationsInCityRequest.getMaxCount(),
+                findNearestLocationsInCityRequest.getMinRating(),
                 findNearestLocationsInCityRequest.getCategory() == null ? null : findNearestLocationsInCityRequest.getCategory().toString());
     }
 

@@ -1,5 +1,7 @@
 package com.example.mediasoftjavaeecityguide.controller;
 
+import com.example.mediasoftjavaeecityguide.controller.dto.FindNearestLocationsInCityRequest;
+import com.example.mediasoftjavaeecityguide.controller.dto.FindNearestLocationsRequest;
 import com.example.mediasoftjavaeecityguide.model.Location;
 import com.example.mediasoftjavaeecityguide.service.LocationService;
 import jakarta.validation.Valid;
@@ -30,7 +32,8 @@ public class LocationController {
             method = RequestMethod.POST,
             path = "/nearest/spec",
             description = "Получить все локации на указанном расстоянии с фильтрацией " +
-                          "с помощью Spring Specification API."
+                          "с помощью Spring Specification API. " +
+                          "Для отключения фильтрации по конкретному параметру его необходимо указать как null."
     )
     public List<Location> findNearestSpec(@Valid @RequestBody FindNearestLocationsRequest request) {
         return locationService.findNearestSpec(request);
@@ -40,7 +43,8 @@ public class LocationController {
             method = RequestMethod.POST,
             path = "/byCityName/native",
             description = "Получить все локации в указанном городе с фильтрацией " +
-                          "с помощью нативного SQL запроса."
+                          "с помощью нативного SQL запроса. " +
+                          "Для отключения фильтрации по конкретному параметру его необходимо указать как null."
     )
     public List<Location> findByCityNameNative(@Valid @RequestBody FindNearestLocationsInCityRequest request) {
         return locationService.findByCityNameNative(request);
