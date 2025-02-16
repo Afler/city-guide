@@ -35,4 +35,8 @@ public class CommentService {
 
         return commentRepository.save(newComment);
     }
+
+    public Comment save(Comment comment) {
+        return commentRepository.save(comment);
+    }
 }

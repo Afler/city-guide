@@ -1,10 +1,13 @@
 package com.example.mediasoftjavaeecityguide;
 
+import com.example.mediasoftjavaeecityguide.controller.FindNearestLocationsInCityRequest;
+import com.example.mediasoftjavaeecityguide.controller.FindNearestLocationsRequest;
 import com.example.mediasoftjavaeecityguide.model.City;
 import com.example.mediasoftjavaeecityguide.model.GeoPoint;
 import com.example.mediasoftjavaeecityguide.model.Location;
 import com.example.mediasoftjavaeecityguide.model.LocationCategory;
 import com.example.mediasoftjavaeecityguide.repository.LocationRepository;
+import com.example.mediasoftjavaeecityguide.repository.UserRepository;
 import com.example.mediasoftjavaeecityguide.service.LocationService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,25 +15,22 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.bean.override.convention.TestBean;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.List;
 import java.util.Optional;
 
-@SpringBootTest(classes = {LocationService.class})
+@ContextConfiguration(classes = {LocationService.class})
 @ExtendWith(SpringExtension.class)
 public class LocationServiceTest {
 
     public static final String TEST_CITY_NAME = "Test city";
     public static final String TEST_LOCATION_NAME = "Test location";
+
+    @MockitoBean
+    private UserRepository userRepository;
 
     @MockitoBean
     private LocationRepository locationRepository;
@@ -40,37 +40,108 @@ public class LocationServiceTest {
 
     @BeforeEach
     public void setUp() {
-        City city = new City(TEST_CITY_NAME);
-        Location location = new Location(TEST_LOCATION_NAME,
+        City city = getCity();
+        Location location = getLocation(city);
+
+        Mockito.when(locationRepository.findByName(TEST_LOCATION_NAME)).thenReturn(Optional.of(location));
+    }
+
+    private City getCity() {
+        return new City(TEST_CITY_NAME);
+    }
+
+    private Location getLocation(City city) {
+        return new Location(TEST_LOCATION_NAME,
                 LocationCategory.ARCHITECTURE,
                 new GeoPoint(0.0, 0.0),
                 0.0,
                 0,
                 city);
+    }
 
-        Mockito.when(locationRepository.findByName(TEST_LOCATION_NAME)).thenReturn(Optional.of(location));
+
+    @Test
+    void locationService_SaveLocation_ReturnLocation() {
+        Location location = getLocation(getCity());
+
+        locationService.save(location);
+
+        Assertions.assertTrue(locationRepository.findByName(TEST_LOCATION_NAME).isPresent());
     }
 
     @Test
-    void addInitialRatingScore() {
+    void locationService_AddLocationFirstRatingScore_ReturnLocation() {
         double newScore = 5.0;
 
         locationService.addRatingScore(TEST_LOCATION_NAME, newScore);
 
-        Assertions.assertTrue(locationService.findByName(TEST_LOCATION_NAME).isPresent());
-        Assertions.assertEquals(locationService.findByName(TEST_LOCATION_NAME).get().getRating(), newScore);
+        Assertions.assertEquals(locationRepository.findByName(TEST_LOCATION_NAME).get().getRating(), newScore);
     }
 
+
     @Test
-    void addRatingScoreToNotZeroScore() {
+    void locationService_AddLocationNotFirstRatingScore_ReturnLocation() {
         double initScore = 2.0;
         double newScore = 5.0;
-
         locationService.addRatingScore(TEST_LOCATION_NAME, initScore);
+
         locationService.addRatingScore(TEST_LOCATION_NAME, newScore);
 
-        Assertions.assertTrue(locationService.findByName(TEST_LOCATION_NAME).isPresent());
-        Assertions.assertEquals(locationService.findByName(TEST_LOCATION_NAME).get().getRating(), (newScore + initScore) / 2);
+        Assertions.assertEquals(locationRepository.findByName(TEST_LOCATION_NAME).get().getRating(), (newScore + initScore) / 2);
     }
 
+    @Test
+    void locationService_FindNearestNative_ReturnLocations() {
+        GeoPoint currentUserPosition = new GeoPoint(0.0, 0.0);
+        Double maxDistanceFilter = 5000.0;
+        Integer maxCount = 2;
+        LocationCategory categoryFilter = LocationCategory.ARCHITECTURE;
+        Double minRatingFilter = 5.0;
+        FindNearestLocationsRequest request = new FindNearestLocationsRequest(
+                currentUserPosition,
+                maxDistanceFilter,
+                maxCount,
+                categoryFilter,
+                minRatingFilter);
+
+        Mockito.when(locationRepository.findNearest(
+                maxDistanceFilter, currentUserPosition.getLatitude(),
+                currentUserPosition.getLongitude(),
+                maxCount, minRatingFilter,
+                categoryFilter.toString())).thenReturn(List.of(getLocation(getCity())));
+
+
+        List<Location> foundLocations = locationService.findNearestNative(request);
+
+        Assertions.assertFalse(foundLocations.isEmpty());
+        Assertions.assertFalse(foundLocations.contains(getLocation(getCity())));
+    }
+
+    @Test
+    void locationService_FindByCityNameNative_ReturnLocations() {
+        City city = getCity();
+        String cityName = city.getName();
+        GeoPoint currentUserPosition = new GeoPoint(0.0, 0.0);
+        Integer maxCount = 2;
+        LocationCategory categoryFilter = LocationCategory.ARCHITECTURE;
+        Double minRatingFilter = 5.0;
+        FindNearestLocationsInCityRequest request = new FindNearestLocationsInCityRequest(
+                currentUserPosition,
+                cityName,
+                maxCount,
+                categoryFilter,
+                minRatingFilter);
+
+        Mockito.when(locationRepository.findByCityName(
+                cityName, currentUserPosition.getLatitude(),
+                currentUserPosition.getLongitude(),
+                maxCount, minRatingFilter,
+                categoryFilter.toString())).thenReturn(List.of(getLocation(city)));
+
+
+        List<Location> foundLocations = locationService.findByCityNameNative(request);
+
+        Assertions.assertFalse(foundLocations.isEmpty());
+        Assertions.assertFalse(foundLocations.contains(getLocation(city)));
+    }
 }

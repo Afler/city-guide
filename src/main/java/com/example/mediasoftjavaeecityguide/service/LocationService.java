@@ -66,18 +66,6 @@ public class LocationService {
         return locationRepository.save(location);
     }
 
-    @Transactional
-    public Location addCommentAboutLocation(String locationName, String username, String content) {
-        Location location = findByName(locationName).orElseThrow();
-        Comment newComment = new Comment();
-
-        newComment.setLocation(location);
-        newComment.setContent(content);
-        newComment.setUser(userRepository.findByUsername(username));
-
-        return locationRepository.save(location);
-    }
-
     public List<Location> findNearestNative(FindNearestLocationsRequest findNearestLocationsRequest) {
         return locationRepository.findNearest(findNearestLocationsRequest.getMaxDistanceFilter(),
                 findNearestLocationsRequest.getCurrentUserPosition().getLatitude(),
