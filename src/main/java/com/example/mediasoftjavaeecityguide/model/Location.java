@@ -1,6 +1,5 @@
 package com.example.mediasoftjavaeecityguide.model;
 
-import com.example.mediasoftjavaeecityguide.utils.GeoUtils;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,10 +7,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.NumberFormat;
 
+import java.util.Set;
+
 @Getter
 @Setter
 @Entity
-@Table(name = "location")
+@Table(name = "location",
+        indexes = {
+                @Index(name = "location_id_index", columnList = "id"),
+                @Index(name = "location_category_index", columnList = "category"),
+                @Index(name = "location_city_id_index", columnList = "city_id")
+        })
 @AllArgsConstructor
 @NoArgsConstructor
 public class Location extends BaseEntity {
@@ -38,11 +44,6 @@ public class Location extends BaseEntity {
     @JoinColumn(name = "city_id")
     private City city;
 
-    public double calculateDistance(Location toLocation) {
-        return GeoUtils.calculateDistance(coordinates, toLocation.getCoordinates());
-    }
-
-    public double calculateDistance(GeoPoint toPoint) {
-        return GeoUtils.calculateDistance(coordinates, toPoint);
-    }
+    @OneToMany(cascade = {CascadeType.PERSIST}, mappedBy = "location", orphanRemoval = true)
+    private Set<Comment> comment;
 }

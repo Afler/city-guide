@@ -1,13 +1,14 @@
 package com.example.mediasoftjavaeecityguide.controller;
 
 import com.example.mediasoftjavaeecityguide.controller.dto.FindCityLocationsRequest;
-import com.example.mediasoftjavaeecityguide.controller.dto.FindNearestLocationsRequest;
+import com.example.mediasoftjavaeecityguide.controller.dto.FindLocationRequest;
 import com.example.mediasoftjavaeecityguide.model.Location;
 import com.example.mediasoftjavaeecityguide.service.LocationService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,19 +25,8 @@ public class LocationController {
             description = "Получить все локации на указанном расстоянии с фильтрацией " +
                           "с помощью нативного SQL запроса."
     )
-    public List<Location> findNearestNative(@Valid @RequestBody FindNearestLocationsRequest request) {
+    public List<Location> findNearestNative(@Valid @RequestBody FindLocationRequest request) {
         return locationService.findNearestNative(request);
-    }
-
-    @SpringSwaggerEndpoint(
-            method = RequestMethod.POST,
-            path = "/nearest/spec",
-            description = "Получить все локации на указанном расстоянии с фильтрацией " +
-                          "с помощью Spring Specification API. " +
-                          "Для отключения фильтрации по конкретному параметру его необходимо указать как null."
-    )
-    public List<Location> findNearestSpec(@Valid @RequestBody FindNearestLocationsRequest request) {
-        return locationService.findNearestSpec(request);
     }
 
     @SpringSwaggerEndpoint(
@@ -44,10 +34,32 @@ public class LocationController {
             path = "/byCityName/native",
             description = "Получить все локации в указанном городе с фильтрацией " +
                           "с помощью нативного SQL запроса. " +
-                          "Для отключения фильтрации по конкретному параметру его необходимо указать как null."
+                          "Для отключения фильтрации по конкретному параметру его необходимо указать как null или удалить из тела запроса."
     )
     public List<Location> findByCityNameNative(@Valid @RequestBody FindCityLocationsRequest request) {
         return locationService.findByCityNameNative(request);
+    }
+
+    @SpringSwaggerEndpoint(
+            method = RequestMethod.POST,
+            path = "/nearest/spec",
+            description = "Получить все локации на указанном расстоянии с фильтрацией " +
+                          "с помощью Spring Data JPA Specification API. " +
+                          "Для отключения фильтрации по конкретному параметру его необходимо указать как null или удалить из тела запроса."
+    )
+    public Page<Location> findNearestSpec(@Valid @RequestBody FindLocationRequest request) {
+        return locationService.findNearestSpec(request);
+    }
+
+    @SpringSwaggerEndpoint(
+            method = RequestMethod.POST,
+            path = "/byCityName/spec",
+            description = "Получить все локации в указанном городе с фильтрацией " +
+                          "с помощью Spring Data JPA Specification API. " +
+                          "Для отключения фильтрации по конкретному параметру его необходимо указать как null или удалить из тела запроса."
+    )
+    public Page<Location> findByCitySpec(@Valid @RequestBody FindCityLocationsRequest request) {
+        return locationService.findByCitySpec(request);
     }
 
     @SpringSwaggerEndpoint(

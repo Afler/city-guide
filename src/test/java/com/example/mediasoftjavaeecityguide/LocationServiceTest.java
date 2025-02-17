@@ -1,7 +1,7 @@
 package com.example.mediasoftjavaeecityguide;
 
 import com.example.mediasoftjavaeecityguide.controller.dto.FindCityLocationsRequest;
-import com.example.mediasoftjavaeecityguide.controller.dto.FindNearestLocationsRequest;
+import com.example.mediasoftjavaeecityguide.controller.dto.FindLocationRequest;
 import com.example.mediasoftjavaeecityguide.model.City;
 import com.example.mediasoftjavaeecityguide.model.GeoPoint;
 import com.example.mediasoftjavaeecityguide.model.Location;
@@ -88,7 +88,7 @@ public class LocationServiceTest {
         Integer maxCount = 2;
         LocationCategory categoryFilter = LocationCategory.ARCHITECTURE;
         Double minRatingFilter = 5.0;
-        FindNearestLocationsRequest request = FindNearestLocationsRequest
+        FindLocationRequest request = FindLocationRequest
                 .builder()
                 .category(categoryFilter)
                 .currentUserPosition(currentUserPosition)
@@ -98,12 +98,14 @@ public class LocationServiceTest {
                 .build();
 
         Mockito.when(locationRepository.findNearest(
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any())).thenReturn(List.of(getLocation(getCity())));
+                        Mockito.any(),
+                        Mockito.any(),
+                        Mockito.any(),
+                        Mockito.any(),
+                        Mockito.any(),
+                        Mockito.any(),
+                        Mockito.any()))
+                .thenReturn(List.of(getLocation(getCity())));
 
         List<Location> foundLocations = locationService.findNearestNative(request);
 
@@ -129,12 +131,15 @@ public class LocationServiceTest {
                 .build();
 
         Mockito.when(locationRepository.findByCityName(
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any(),
-                Mockito.any())).thenReturn(List.of(getLocation(getCity())));
+                        Mockito.any(),
+                        Mockito.any(),
+                        Mockito.any(),
+                        Mockito.any(),
+                        Mockito.any(),
+                        Mockito.any(),
+                        Mockito.any(),
+                        Mockito.any()))
+                .thenReturn(List.of(getLocation(getCity())));
 
 
         List<Location> foundLocations = locationService.findByCityNameNative(request);

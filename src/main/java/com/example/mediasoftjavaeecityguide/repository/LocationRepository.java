@@ -20,7 +20,7 @@ public interface LocationRepository extends JpaRepository<Location, Long>, JpaSp
             from location as loc
             where (:category IS NULL OR category = :category)
             and (:minRating IS NULL OR rating >= :minRating)
-            order by distance
+            order by :sortField
             limit :lim)
             select * from locations_by_distance
             where (:dist IS NULL OR distance <= :dist)
@@ -30,7 +30,8 @@ public interface LocationRepository extends JpaRepository<Location, Long>, JpaSp
                                @Param("fromLon") Double fromLon,
                                @Param("lim") Integer limit,
                                @Param("minRating") @DecimalMin("0.0") @DecimalMax("5.0") Double minRating,
-                               @Param("category") String category);
+                               @Param("category") String category,
+                               @Param("sortField") String sortField);
 
     @Query(value = """
             with locations_by_distance AS
@@ -40,16 +41,19 @@ public interface LocationRepository extends JpaRepository<Location, Long>, JpaSp
             where (:cityName is NULL OR city.name = :cityName)
             and (:category IS NULL OR category = :category)
             and (:minRating IS NULL OR rating >= :minRating)
-            order by distance
+            order by :sortField
             limit :lim)
             select * from locations_by_distance
+            where (:dist IS NULL OR distance <= :dist)
             """, nativeQuery = true)
-    List<Location> findByCityName(@Param("cityName") String cityName,
+    List<Location> findByCityName(@Param("dist") Double distance,
+                                  @Param("cityName") String cityName,
                                   @Param("fromLat") Double fromLat,
                                   @Param("fromLon") Double fromLon,
                                   @Param("lim") Integer limit,
                                   @Param("minRating") @DecimalMin("0.0") @DecimalMax("5.0") Double minRating,
-                                  @Param("category") String category);
+                                  @Param("category") String category,
+                                  @Param("sortField") String sortField);
 
     Optional<Location> findByName(String name);
 }

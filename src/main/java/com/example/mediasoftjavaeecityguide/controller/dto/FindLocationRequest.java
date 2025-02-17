@@ -18,6 +18,9 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class FindLocationRequest {
 
+    @Schema(description = "Фильтр по максимальной дистанции от текущей позиции")
+    private Double maxDistanceFilter;
+
     @NotNull
     @Schema(description = "Текущая позиция пользователя")
     private GeoPoint currentUserPosition;
@@ -36,4 +39,7 @@ public class FindLocationRequest {
             maximum = "5.0",
             defaultValue = "0.0")
     private Double minRating = 0.0;
+
+    @Schema(description = "Поле сортировки.", defaultValue = "DISTANCE", nullable = true)
+    private LocationSortField sortBy;
 }
