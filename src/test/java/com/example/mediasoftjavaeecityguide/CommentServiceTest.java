@@ -48,7 +48,6 @@ public class CommentServiceTest {
         Mockito.when(commentRepository.findByLocation_Name(TEST_LOCATION_NAME)).thenReturn(List.of(getComment()));
     }
 
-
     private City getCity() {
         return new City(TEST_CITY_NAME);
     }

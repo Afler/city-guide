@@ -49,3 +49,60 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+bootJar {
+    doFirst {
+        manifest {
+            attributes(
+                    'Implementation-Version': "${getDate()}"
+            )
+        }
+    }
+    archiveFileName = "${archiveBaseName.get()}.${archiveExtension.get()}"
+}
+
+static def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('yyyyMMdd')
+    return formattedDate
+}
+
+tasks.register('copyFilesToReleaseDir', Task) {
+    doLast {
+        copy {
+            from "build/libs"
+            into "build/release"
+        }
+
+        copy {
+            from "release"
+            into "build/release"
+        }
+
+        copy {
+            from "README.md", "docker-compose.yaml"
+            into "build/release"
+        }
+
+        copy {
+            from "build/resources/main"
+            into "build/release/config"
+            include 'application.yaml'
+        }
+
+    }
+}
+
+tasks.register('archiveReleaseDir', Zip) {
+    from 'build/release/'
+    include '*'
+    include '**/**'
+    getArchiveFileName().set("${archiveBaseName.get()}-${project.property('version')}-${getDate()}.zip")
+    getDestinationDirectory().set(file('/build/releaseArchive/'))
+    metadataCharset 'utf-8'
+}
+
+tasks.register('buildToRelease', GradleBuild) {
+    buildName = "t1"
+    tasks = ['clean', 'bootJar', 'copyFilesToReleaseDir', 'archiveReleaseDir']
+}
