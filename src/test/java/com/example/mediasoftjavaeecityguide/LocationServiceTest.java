@@ -19,6 +19,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,9 +29,6 @@ public class LocationServiceTest {
 
     public static final String TEST_CITY_NAME = "Test city";
     public static final String TEST_LOCATION_NAME = "Test location";
-
-    @MockitoBean
-    private UserRepository userRepository;
 
     @MockitoBean
     private LocationRepository locationRepository;
@@ -56,7 +54,7 @@ public class LocationServiceTest {
                 new GeoPoint(0.0, 0.0),
                 0.0,
                 0,
-                city);
+                city, new HashSet<>());
     }
 
 

@@ -29,12 +29,6 @@ public class LocationService {
     @Autowired
     private LocationRepository locationRepository;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private RequestService requestBuilder;
-
     public List<Location> findAll() {
         return locationRepository.findAll();
     }
