@@ -12,11 +12,15 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
 server:
   port: '90'
 springdoc:
   show-login-endpoint: true
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type: TRACE
 
 app:
   version: 0.1

@@ -31,17 +31,6 @@ public class LocationController {
 
     @SpringSwaggerEndpoint(
             method = RequestMethod.POST,
-            path = "/byCityName/native",
-            description = "Получить все локации в указанном городе с фильтрацией " +
-                          "с помощью нативного SQL запроса. " +
-                          "Для отключения фильтрации по конкретному параметру его необходимо указать как null или удалить из тела запроса."
-    )
-    public List<Location> findByCityNameNative(@Valid @RequestBody FindCityLocationsRequest request) {
-        return locationService.findByCityNameNative(request);
-    }
-
-    @SpringSwaggerEndpoint(
-            method = RequestMethod.POST,
             path = "/nearest/spec",
             description = "Получить все локации на указанном расстоянии с фильтрацией " +
                           "с помощью Spring Data JPA Specification API. " +
@@ -49,6 +38,17 @@ public class LocationController {
     )
     public Page<Location> findNearestSpec(@Valid @RequestBody FindLocationRequest request) {
         return locationService.findNearestSpec(request);
+    }
+
+    @SpringSwaggerEndpoint(
+            method = RequestMethod.POST,
+            path = "/byCityName/native",
+            description = "Получить все локации в указанном городе с фильтрацией " +
+                          "с помощью нативного SQL запроса. " +
+                          "Для отключения фильтрации по конкретному параметру его необходимо указать как null или удалить из тела запроса."
+    )
+    public List<Location> findByCityNameNative(@Valid @RequestBody FindCityLocationsRequest request) {
+        return locationService.findByCityNameNative(request);
     }
 
     @SpringSwaggerEndpoint(

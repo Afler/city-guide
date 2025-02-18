@@ -3,6 +3,7 @@ package com.example.mediasoftjavaeecityguide.repository;
 import com.example.mediasoftjavaeecityguide.model.Location;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -15,12 +16,11 @@ public interface LocationRepository extends JpaRepository<Location, Long>, JpaSp
 
     @Query(value = """
             with locations_by_distance AS
-            (SELECT id, name, category, rating, latitude, longitude, rating_num, city_id,
+            (SELECT loc.id, loc.name, category, rating, latitude, longitude, rating_num, city_id,
             (ST_DistanceSphere(ST_Point(loc.latitude, loc.longitude), ST_Point(:fromLat, :fromLon))) as distance
             from location as loc
             where (:category IS NULL OR category = :category)
             and (:minRating IS NULL OR rating >= :minRating)
-            order by :sortField
             limit :lim)
             select * from locations_by_distance
             where (:dist IS NULL OR distance <= :dist)
@@ -31,7 +31,7 @@ public interface LocationRepository extends JpaRepository<Location, Long>, JpaSp
                                @Param("lim") Integer limit,
                                @Param("minRating") @DecimalMin("0.0") @DecimalMax("5.0") Double minRating,
                                @Param("category") String category,
-                               @Param("sortField") String sortField);
+                               Pageable pageable);
 
     @Query(value = """
             with locations_by_distance AS
@@ -41,7 +41,6 @@ public interface LocationRepository extends JpaRepository<Location, Long>, JpaSp
             where (:cityName is NULL OR city.name = :cityName)
             and (:category IS NULL OR category = :category)
             and (:minRating IS NULL OR rating >= :minRating)
-            order by :sortField
             limit :lim)
             select * from locations_by_distance
             where (:dist IS NULL OR distance <= :dist)
@@ -53,7 +52,7 @@ public interface LocationRepository extends JpaRepository<Location, Long>, JpaSp
                                   @Param("lim") Integer limit,
                                   @Param("minRating") @DecimalMin("0.0") @DecimalMax("5.0") Double minRating,
                                   @Param("category") String category,
-                                  @Param("sortField") String sortField);
+                                  Pageable pageable);
 
     Optional<Location> findByName(String name);
 }

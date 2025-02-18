@@ -11,6 +11,7 @@ import jakarta.persistence.criteria.*;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import org.locationtech.jts.geom.Geometry;
+import org.springdoc.webmvc.core.service.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +31,9 @@ public class LocationService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RequestService requestBuilder;
 
     public List<Location> findAll() {
         return locationRepository.findAll();
@@ -54,6 +58,10 @@ public class LocationService {
     }
 
     public List<Location> findNearestNative(FindLocationRequest findLocationRequest) {
+        LocationSortField sortField = findLocationRequest.getSortBy();
+        Sort sortRule = getSortRule(sortField);
+        PageRequest pagination = PageRequest.of(0, findLocationRequest.getMaxCount(), sortRule);
+
         return locationRepository.findNearest(
                 findLocationRequest.getMaxDistanceFilter(),
                 findLocationRequest.getCurrentUserPosition().getLatitude(),
@@ -61,10 +69,14 @@ public class LocationService {
                 findLocationRequest.getMaxCount(),
                 findLocationRequest.getMinRating(),
                 findLocationRequest.getCategory() == null ? null : findLocationRequest.getCategory().toString(),
-                findLocationRequest.getSortBy() == null ? null : findLocationRequest.getSortBy().toString());
+                pagination);
     }
 
     public List<Location> findByCityNameNative(FindCityLocationsRequest findNearestLocationsInCityRequest) {
+        LocationSortField sortField = findNearestLocationsInCityRequest.getSortBy();
+        Sort sortRule = getSortRule(sortField);
+        PageRequest pagination = PageRequest.of(0, findNearestLocationsInCityRequest.getMaxCount(), sortRule);
+
         return locationRepository.findByCityName(
                 findNearestLocationsInCityRequest.getMaxDistanceFilter(),
                 findNearestLocationsInCityRequest.getCityName(),
@@ -73,14 +85,24 @@ public class LocationService {
                 findNearestLocationsInCityRequest.getMaxCount(),
                 findNearestLocationsInCityRequest.getMinRating(),
                 findNearestLocationsInCityRequest.getCategory() == null ? null : findNearestLocationsInCityRequest.getCategory().toString(),
-                findNearestLocationsInCityRequest.getSortBy() == null ? null : findNearestLocationsInCityRequest.getSortBy().toString());
+                pagination);
+    }
+
+    private static Sort getSortRule(LocationSortField sortField) {
+        Sort sortRule;
+        if (sortField == null || sortField.toString().isBlank()) {
+            sortRule = Sort.unsorted();
+        } else {
+            sortRule = Sort.by(Sort.Direction.ASC, sortField.getFieldColumnName());
+        }
+        return sortRule;
     }
 
     public Page<Location> findNearestSpec(FindLocationRequest findLocationRequest) {
-        Sort sortRule = Sort.by(findLocationRequest.getSortBy().toString());
-        PageRequest pagination = PageRequest.of(0, findLocationRequest.getMaxCount(), sortRule);
+        PageRequest pagination = PageRequest.of(0, findLocationRequest.getMaxCount());
 
-        return locationRepository.findAll(Specification.where(hasMaxDistance(findLocationRequest))
+        return locationRepository.findAll(
+                Specification.where(hasMaxDistanceWithSort(findLocationRequest))
                         .and(hasCategory(findLocationRequest.getCategory()))
                         .and(hasMinimumRating(findLocationRequest.getMinRating()))
                         .and(orderBy(findLocationRequest.getSortBy())),
@@ -88,11 +110,11 @@ public class LocationService {
     }
 
     public Page<Location> findByCitySpec(FindCityLocationsRequest findNearestLocationsInCityRequest) {
-        Sort sortRule = Sort.by(findNearestLocationsInCityRequest.getSortBy().toString());
-        PageRequest pagination = PageRequest.of(0, findNearestLocationsInCityRequest.getMaxCount(), sortRule);
+        PageRequest pagination = PageRequest.of(0, findNearestLocationsInCityRequest.getMaxCount());
 
-        return locationRepository.findAll(Specification.where(hasCity(findNearestLocationsInCityRequest.getCityName()))
-                        .and(hasMaxDistance(findNearestLocationsInCityRequest))
+        return locationRepository.findAll(
+                Specification.where(hasCity(findNearestLocationsInCityRequest.getCityName()))
+                        .and(hasMaxDistanceWithSort(findNearestLocationsInCityRequest))
                         .and(hasCategory(findNearestLocationsInCityRequest.getCategory()))
                         .and(hasMinimumRating(findNearestLocationsInCityRequest.getMinRating()))
                         .and(orderBy(findNearestLocationsInCityRequest.getSortBy())),
@@ -101,11 +123,7 @@ public class LocationService {
 
     private static Specification<Location> orderBy(LocationSortField sortField) {
         return (root, query, criteriaBuilder) -> {
-            if (sortField.equals(LocationSortField.DISTANCE)) {
-                //TODO сортировка по вычисляемому столбцу
-                List<Order> orderList = query.getOrderList();
-                query.orderBy(orderList.get(0));
-            } else {
+            if (sortField != null && !sortField.equals(LocationSortField.DISTANCE)) {
                 query.orderBy(criteriaBuilder.asc(root.get(sortField.toString())));
             }
             return null;
@@ -134,28 +152,38 @@ public class LocationService {
         return (root, query, criteriaBuilder) -> {
             if (cityName == null || cityName.isBlank()) return null;
 
-            Join<Object, Object> locationCity = root.join("city_id");
+            Join<Object, Object> locationCity = root.join("city");
             return criteriaBuilder.equal(locationCity.get("name"), criteriaBuilder.literal(cityName));
         };
     }
 
-    private static Specification<Location> hasMaxDistance(FindLocationRequest findLocationRequest) {
+    private static Specification<Location> hasMaxDistanceWithSort(FindLocationRequest findLocationRequest) {
         return (root, query, criteriaBuilder) -> {
             Double maxDistanceFilter = findLocationRequest.getMaxDistanceFilter();
-            if (maxDistanceFilter == null) return null;
+            LocationSortField sortField = findLocationRequest.getSortBy();
+            if (maxDistanceFilter == null && sortField != LocationSortField.DISTANCE) return null;
 
-            Path<Double> locationLat = root.get("coordinates").get("latitude");
-            Path<Double> locationLon = root.get("coordinates").get("longitude");
-            Expression<Geometry> locationCoords = criteriaBuilder.function("ST_Point", Geometry.class, locationLat, locationLon);
+            Expression<Double> distanceToUser = getDistanceToUser(findLocationRequest, root, criteriaBuilder);
 
-            Expression<Double> currentUserLat = criteriaBuilder.literal(findLocationRequest.getCurrentUserPosition().getLatitude());
-            Expression<Double> currentUserLon = criteriaBuilder.literal(findLocationRequest.getCurrentUserPosition().getLongitude());
-//            JTSSpatialCriteriaBuilder jtsBuilder = ((SqmCriteriaNodeBuilder) criteriaBuilder).unwrap(JTSSpatialCriteriaBuilder.class);
-            Expression<Geometry> userCoords = criteriaBuilder.function("ST_Point", Geometry.class, currentUserLat, currentUserLon);
-            Expression<Double> distanceToUser = criteriaBuilder.function("ST_DistanceSphere", Double.class, locationCoords, userCoords);
+            if (sortField == LocationSortField.DISTANCE)
+                query.orderBy(criteriaBuilder.asc(distanceToUser));
 
-            return criteriaBuilder.le(distanceToUser, maxDistanceFilter);
+            if (maxDistanceFilter != null)
+                return criteriaBuilder.le(distanceToUser, maxDistanceFilter);
+            else return null;
         };
+    }
+
+    private static Expression<Double> getDistanceToUser(FindLocationRequest findLocationRequest, Root<Location> root, CriteriaBuilder criteriaBuilder) {
+        Path<Double> locationLat = root.get("coordinates").get("latitude");
+        Path<Double> locationLon = root.get("coordinates").get("longitude");
+        Expression<Geometry> locationCoords = criteriaBuilder.function("ST_Point", Geometry.class, locationLat, locationLon);
+
+        Expression<Double> currentUserLat = criteriaBuilder.literal(findLocationRequest.getCurrentUserPosition().getLatitude());
+        Expression<Double> currentUserLon = criteriaBuilder.literal(findLocationRequest.getCurrentUserPosition().getLongitude());
+//            JTSSpatialCriteriaBuilder jtsBuilder = ((SqmCriteriaNodeBuilder) criteriaBuilder).unwrap(JTSSpatialCriteriaBuilder.class);
+        Expression<Geometry> userCoords = criteriaBuilder.function("ST_Point", Geometry.class, currentUserLat, currentUserLon);
+        return criteriaBuilder.function("ST_DistanceSphere", Double.class, locationCoords, userCoords);
     }
 
 }
