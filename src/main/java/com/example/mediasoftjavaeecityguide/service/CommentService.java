@@ -7,6 +7,7 @@ import com.example.mediasoftjavaeecityguide.repository.CommentRepository;
 import com.example.mediasoftjavaeecityguide.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class CommentService {
     }
 
     public Comment save(String username, String locationName, String content) {
-        Location location = locationRepository.findByName(locationName).orElseThrow();
+        Location location = locationRepository.findByName(locationName).orElseThrow(LocationNotFoundException::new);
 
         Comment newComment = new Comment();
         newComment.setId(null);

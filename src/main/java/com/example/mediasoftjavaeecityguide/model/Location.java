@@ -43,7 +43,4 @@ public class Location extends BaseEntity {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "city_id")
     private City city;
-
-    @OneToMany(cascade = {CascadeType.PERSIST}, mappedBy = "location", orphanRemoval = true)
-    private Set<Comment> comment;
 }

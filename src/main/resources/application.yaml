@@ -9,6 +9,9 @@ spring:
   liquibase:
     change-log: 'classpath:/db/changelog/db.changelog-master.xml'
     enabled: true
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
   jpa:
     hibernate:
       ddl-auto: validate

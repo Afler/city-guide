@@ -29,17 +29,13 @@ public class LocationService {
     @Autowired
     private LocationRepository locationRepository;
 
-    public List<Location> findAll() {
-        return locationRepository.findAll();
-    }
-
     public Optional<Location> findByName(String name) {
         return locationRepository.findByName(name);
     }
 
     @Transactional
-    public Location addRatingScore(String locationName, @DecimalMin("1.0") @DecimalMax("5.0") Double score) {
-        Location location = locationRepository.findByName(locationName).orElseThrow();
+    public Location addRatingScore(String locationName, Double score) {
+        Location location = locationRepository.findByName(locationName).orElseThrow(LocationNotFoundException::new);
         Double currentRating = location.getRating();
         Integer currentRatingNum = location.getRatingNum();
 

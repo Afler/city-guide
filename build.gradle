@@ -89,7 +89,10 @@ tasks.register('copyFilesToReleaseDir', Task) {
             into "build/release/config"
             include 'application.yaml'
         }
-
+        copy {
+            from "docker"
+            into "build/release/docker"
+        }
     }
 }
 

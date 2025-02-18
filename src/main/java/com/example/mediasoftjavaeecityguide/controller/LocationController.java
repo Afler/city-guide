@@ -3,6 +3,8 @@ package com.example.mediasoftjavaeecityguide.controller;
 import com.example.mediasoftjavaeecityguide.controller.dto.FindCityLocationsRequest;
 import com.example.mediasoftjavaeecityguide.controller.dto.FindLocationRequest;
 import com.example.mediasoftjavaeecityguide.model.Location;
+import com.example.mediasoftjavaeecityguide.model.LocationCategory;
+import com.example.mediasoftjavaeecityguide.service.LocationNotFoundException;
 import com.example.mediasoftjavaeecityguide.service.LocationService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
@@ -68,7 +70,7 @@ public class LocationController {
             description = "Найти локацию по названию."
     )
     public Location addLocationRatingScore(@RequestParam String locationName) {
-        return locationService.findByName(locationName).orElse(null);
+        return locationService.findByName(locationName).orElseThrow(LocationNotFoundException::new);
     }
 
     @SpringSwaggerEndpoint(
@@ -77,7 +79,7 @@ public class LocationController {
             description = "Выставить оценку локации."
     )
     public Location addLocationRatingScore(@RequestParam String locationName,
-                                           @RequestParam @DecimalMin("0.0") @DecimalMax("5.0") Double score) {
+                                           @RequestParam @DecimalMin("1.0") @DecimalMax("5.0") Double score) {
         return locationService.addRatingScore(locationName, score);
     }
 
