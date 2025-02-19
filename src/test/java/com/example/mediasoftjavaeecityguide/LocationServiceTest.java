@@ -7,7 +7,6 @@ import com.example.mediasoftjavaeecityguide.model.GeoPoint;
 import com.example.mediasoftjavaeecityguide.model.Location;
 import com.example.mediasoftjavaeecityguide.model.LocationCategory;
 import com.example.mediasoftjavaeecityguide.repository.LocationRepository;
-import com.example.mediasoftjavaeecityguide.repository.UserRepository;
 import com.example.mediasoftjavaeecityguide.service.LocationService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +18,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,7 +52,7 @@ public class LocationServiceTest {
                 new GeoPoint(0.0, 0.0),
                 0.0,
                 0,
-                city, new HashSet<>());
+                city);
     }
 
 

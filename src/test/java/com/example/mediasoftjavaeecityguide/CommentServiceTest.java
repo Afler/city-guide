@@ -15,7 +15,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,8 +57,7 @@ public class CommentServiceTest {
                 new GeoPoint(0.0, 0.0),
                 0.0,
                 0,
-                city,
-                new HashSet<>());
+                city);
     }
 
     private Comment getComment() {

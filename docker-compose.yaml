@@ -1,3 +1,5 @@
+name: "city-guide"
+
 services:
   postgres:
     image: postgis/postgis:15-3.5

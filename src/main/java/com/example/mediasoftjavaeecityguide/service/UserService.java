@@ -22,25 +22,16 @@ public class UserService implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final CommentRepository commentRepository;
-
     @PostConstruct
     void post() {
-        commentRepository.deleteAll();
-        userRepository.deleteAll();
+        if (userRepository.findByUsername("user").isEmpty()) {
+            User user = new User(
+                    "user",
+                    passwordEncoder.encode("user"),
+                    Set.of(new SimpleGrantedAuthority("USER")));
 
-        User user = new User(
-                "user",
-                passwordEncoder.encode("user"),
-                Set.of(new SimpleGrantedAuthority("USER")));
-
-        User admin = new User(
-                "admin",
-                passwordEncoder.encode("admin"),
-                Set.of(new SimpleGrantedAuthority("ADMIN")));
-
-        userRepository.save(user);
-        userRepository.save(admin);
+            userRepository.save(user);
+        }
     }
 
     @Override
